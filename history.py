@@ -19,3 +19,25 @@ class History:
         both the AES key and the message.
         """
         self.messages: List[Message] = []
+
+    def decode(self, json_dict) -> None:
+        messages = []
+        for msg_dict in json_dict["messages"]:
+            message = Message(
+                ciphertext=bytes.fromhex(msg_dict["ciphertext"]),
+                mac=bytes.fromhex(msg_dict["mac"]),
+                iv=bytes.fromhex(msg_dict["iv"]) if msg_dict["iv"] else b""
+            )
+            messages.append(message)
+        self.messages = messages
+    
+    def encode(self) -> dict:
+        json_dict = {"messages": []}
+        for message in self.messages:
+            msg_dict = {
+                "ciphertext": message.ciphertext.hex(),
+                "mac": message.mac.hex(),
+                "iv": message.iv.hex() if message.iv else ""
+            }
+            json_dict["messages"].append(msg_dict)
+        return json_dict
