@@ -5,10 +5,20 @@ from cryptography.hazmat.primitives import padding
 import os
 
 class AES:
-    def __init__(self, key = os.urandom(32), iv = os.urandom(16)):
-        self.key = key
-        self.iv = iv
-        self.cipher = Cipher(AES256(self.key), CBC(self.iv))
+    _instance = None
+    _initialized = False
+
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self, key=os.urandom(32), iv=os.urandom(16)):
+        if not AES._initialized:
+            self.key = key
+            self.iv = iv
+            self.cipher = Cipher(AES256(self.key), CBC(self.iv))
+            AES._initialized = True
 
     def encrypt(self, plaintext: str) -> bytes:
         padder = padding.PKCS7(128).padder()
