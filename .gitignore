@@ -87,5 +87,7 @@ node_modules/
 history.pyc
 history/*.pyc
 
+testing/
+
 # End of file
 

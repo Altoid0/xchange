@@ -17,9 +17,9 @@ class Generate:
                 private_key = priv_file.read()
             with open(pub_key_path, "rb") as pub_file:
                 public_key = pub_file.read()
+            print("Private key already exists. Key pair generation skipped.")
             return public_key, private_key
         else:
-            print("Private key already exists. Key pair generation skipped.")
             return None, None
 
     def write_pair(self) -> None:

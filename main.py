@@ -1,6 +1,7 @@
 from session import Session
 from actions.generate import Generate
 import click
+import os
 
 @click.command()
 @click.option(
@@ -15,6 +16,8 @@ import click
     help="Path to the shared directory which holds the public keys"
 )
 def main(profile: str, shared: str):
+    profile = os.path.normpath(profile)
+    shared = os.path.normpath(shared)
     session = Session(shared_path=shared, profile_path=profile)
 
     click.echo(f"Profile path set to: {session.profile_path}")
