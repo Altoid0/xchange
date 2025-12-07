@@ -1,5 +1,5 @@
 from session import Session
-from actions.generate import Generate
+from components.secret_manager import SecretManager
 import click
 import os
 
@@ -24,7 +24,7 @@ def main(profile: str, shared: str):
     click.echo(f"Shared path set to: {session.shared_path}")
 
     # Map to hold action instances
-    actions = {}
+    components = {}
 
     try:
         while True:
@@ -42,13 +42,12 @@ def main(profile: str, shared: str):
             if cmd == "1":
                 click.echo("Generating keys...")
 
-                # Initialize Generate action if not already done
-                if not actions.get("generate"):
-                    actions["generate"] = Generate(session)
+                # Initialize SecretManager action if not already done
+                if not components.get("secret_manager"):
+                    components["secret_manager"] = SecretManager(session)
                 
                 # Call the generate wrapper method to handle key pair generation
-                actions["generate"].generate()
-
+                components["secret_manager"].generate_pair()
             elif cmd == "2":
                 click.echo("Writing encrypted message...")
                 # Placeholder for writing encrypted message logic

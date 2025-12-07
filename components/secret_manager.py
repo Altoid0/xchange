@@ -3,11 +3,12 @@ from session import Session
 from crypto.rsa import RSA
 from crypto.aes import AES
 
-class Generate:
+class SecretManager:
     def __init__ (self, session: Session):
         self.session = session
+        self.aes = None
 
-    def get_pair(self) -> tuple:
+    def read_pair(self) -> tuple:
         # Check if priv.key exists in profile path
         priv_key_path = os.path.join(self.session.get_profile_path, "priv.key")
         profile_name = os.path.basename(self.session.get_profile_path)
@@ -38,7 +39,10 @@ class Generate:
             
             print(f"Key pair generated and saved:\nPrivate Key: {priv_key_path}\nPublic Key: {pub_key_path}")
 
-    def generate(self) -> None:
-        public_key, private_key = self.get_pair()
+    def generate_pair(self) -> None:
+        public_key, private_key = self.read_pair()
         if public_key is None or private_key is None:
             self.write_pair()
+
+    def set_aes(self, aes: AES) -> None:
+        self.aes = aes
