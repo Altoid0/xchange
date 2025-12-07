@@ -1,5 +1,7 @@
 from session import Session
 from components.secret_manager import SecretManager
+from components.sender import Sender
+from components.receiver import Receiver
 import click
 import os
 
@@ -19,13 +21,10 @@ def main(profile: str, shared: str):
     profile = os.path.normpath(profile)
     shared = os.path.normpath(shared)
     session = Session(shared_path=shared, profile_path=profile)
-
     click.echo(f"Profile path set to: {session.profile_path}")
     click.echo(f"Shared path set to: {session.shared_path}")
-
     # Map to hold action instances
     components = {}
-
     try:
         while True:
             click.echo(
@@ -41,7 +40,6 @@ def main(profile: str, shared: str):
             
             if cmd == "1":
                 click.echo("Generating keys...")
-
                 # Initialize SecretManager action if not already done
                 if not components.get("secret_manager"):
                     components["secret_manager"] = SecretManager(session)
@@ -50,14 +48,25 @@ def main(profile: str, shared: str):
                 components["secret_manager"].generate_pair()
             elif cmd == "2":
                 click.echo("Writing encrypted message...")
-                # Placeholder for writing encrypted message logic
+                
+                message_file = click.prompt("Enter path to message file")
+                receiver_name = click.prompt("Enter receiver's profile name")
+                
+                # Initialize sender
+                components["sender"] = Sender(session)
+                components["sender"].send_message(message_file, receiver_name)
+                
             elif cmd == "3":
                 click.echo("Reading encrypted message...")
-                # Placeholder for reading encrypted message logic
-
+                
+                # Initialize receiver
+                if not components.get("receiver"):
+                    components["receiver"] = Receiver(session)
+                
+                components["receiver"].receive_message()
+                
     except (KeyboardInterrupt, SystemExit):
         click.echo("\nExiting application.")
 
 if __name__ == "__main__":
     main()
-    
