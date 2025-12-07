@@ -4,22 +4,21 @@ from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives import padding
 import os
 
+
 class AES:
-    _instance = None
-    _initialized = False
-
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-    
-    def __init__(self, key=os.urandom(32), iv=os.urandom(16)):
-        if not AES._initialized:
+    def __init__(self, key=None, iv=None):
+        if key is None:
+            self.key = os.urandom(32)
+        else:
             self.key = key
+            
+        if iv is None:
+            self.iv = os.urandom(16)
+        else:
             self.iv = iv
-            self.cipher = Cipher(AES256(self.key), CBC(self.iv))
-            AES._initialized = True
-
+            
+        self.cipher = Cipher(AES256(self.key), CBC(self.iv))
+    
     def encrypt(self, plaintext: str) -> bytes:
         padder = padding.PKCS7(128).padder()
         padded_data = padder.update(plaintext.encode()) + padder.finalize()
@@ -36,8 +35,7 @@ class AES:
     @property
     def get_key(self) -> bytes:
         return self.key
-
+    
     @property
     def get_iv(self) -> bytes:
         return self.iv
-        
