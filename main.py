@@ -7,47 +7,38 @@ import click
 import os
 
 @click.command()
-@click.option(
-    "--profile", 
-    type=click.Path(exists=True, dir_okay=True, writable=True),
-    help="Path to the profile directory which holds the private key"
-)
-def main(profile: str):
+def main():
     shared_folder_path = Path("shared")
     shared_folder_path.mkdir(parents=True, exist_ok=True)
 
-    # user_name = click.prompt("Enter a user name for this session")
-    # user_name = user_name.lower().strip()
+    user_name = click.prompt("Enter a username for this session")
+    user_profile_path = Path(f"profiles/{user_name.lower().strip()}")
+    user_profile_path.mkdir(parents=True, exist_ok=True)
 
-    profile = os.path.normpath(profile)
     shared = os.path.normpath(shared_folder_path)
-    session = Session(shared_path=shared, profile_path=profile)
+    session = Session(shared_path=shared, profile_path=user_profile_path)
     click.echo(f"Profile path set to: {session.profile_path}")
     click.echo(f"Shared path set to: {session.shared_path}")
+
+    click.echo("Generating key pairs...")
+    # Handle key pair generation for the current session
+    SecretManager(session).generate_pair()
+
+
     # Map to hold action instances
     components = {}
     try:
         while True:
             click.echo(
                 "\nMenu:\n"
-                "1. Generate Keys\n"
-                "2. Write Encrypted Message\n"
-                "3. Read Encrypted Message\n"
+                "1. Write Encrypted Message\n"
+                "2. Read Encrypted Message\n"
             )
             cmd = click.prompt("Enter an action number (type 'q' to quit)")
             cmd = cmd.lower().strip()
             if cmd == "q":
                 raise SystemExit
-            
-            if cmd == "1":
-                click.echo("Generating keys...")
-                # Initialize SecretManager action if not already done
-                if not components.get("secret_manager"):
-                    components["secret_manager"] = SecretManager(session)
-                
-                # Call the generate wrapper method to handle key pair generation
-                components["secret_manager"].generate_pair()
-            elif cmd == "2":
+            elif cmd == "1":
                 click.echo("Writing encrypted message...")
                 
                 message_file = click.prompt("Enter path to message file")
@@ -57,7 +48,7 @@ def main(profile: str):
                 components["sender"] = Sender(session)
                 components["sender"].send_message(message_file, receiver_name)
                 
-            elif cmd == "3":
+            elif cmd == "2":
                 click.echo("Reading encrypted message...")
                 
                 # Initialize receiver
