@@ -89,5 +89,11 @@ history/*.pyc
 
 testing/
 
+
+# Custom files
+profiles/*
+shared/*
+message.txt
+
 # End of file
 

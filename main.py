@@ -2,6 +2,7 @@ from session import Session
 from components.secret_manager import SecretManager
 from components.sender import Sender
 from components.receiver import Receiver
+from pathlib import Path
 import click
 import os
 
@@ -11,15 +12,15 @@ import os
     type=click.Path(exists=True, dir_okay=True, writable=True),
     help="Path to the profile directory which holds the private key"
 )
-@click.option(
-    "--shared",
-    default=".",
-    type=click.Path(exists=True, dir_okay=True, writable=True),
-    help="Path to the shared directory which holds the public keys"
-)
-def main(profile: str, shared: str):
+def main(profile: str):
+    shared_folder_path = Path("shared")
+    shared_folder_path.mkdir(parents=True, exist_ok=True)
+
+    # user_name = click.prompt("Enter a user name for this session")
+    # user_name = user_name.lower().strip()
+
     profile = os.path.normpath(profile)
-    shared = os.path.normpath(shared)
+    shared = os.path.normpath(shared_folder_path)
     session = Session(shared_path=shared, profile_path=profile)
     click.echo(f"Profile path set to: {session.profile_path}")
     click.echo(f"Shared path set to: {session.shared_path}")
